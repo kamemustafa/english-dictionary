@@ -12,13 +12,10 @@ background:#f4f6f8;
 margin:0;
 padding:10px;
 }
-h1{
-text-align:center;
-color:#2c3e50;
-}
+h1{text-align:center;color:#2c3e50;}
 input,select,button{
 width:100%;
-padding:10px;
+padding:12px;
 margin:5px 0;
 font-size:16px;
 border-radius:6px;
@@ -32,7 +29,7 @@ margin-top:10px;
 box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 .word{font-size:20px;font-weight:bold;color:#2980b9}
-.meaning,.example{margin-top:5px}
+.meaning{margin-top:5px;font-size:18px;}
 .btn{
 background:#27ae60;
 color:#fff;
@@ -61,33 +58,41 @@ border:none;
 <option value="ar|ur">Arabic → Urdu</option>
 </select>
 
-<button class="btn" onclick="translate()">Translate</button>
-<button class="speak" onclick="speak()">🔊 Speak</button>
+<button class="btn" onclick="translateText()">Translate</button>
+<button class="speak" onclick="speakText()">🔊 Speak</button>
 
 <div class="box">
-<div class="word">Result:</div>
-<div class="meaning" id="result"></div>
+<div class="word">Translation Result:</div>
+<div class="meaning" id="result">---</div>
 </div>
 
 <script>
-
-function translate(){
+async function translateText(){
 let text = document.getElementById("text").value;
 let lang = document.getElementById("lang").value;
 
-fetch(`https://api.mymemory.translated.net/get?q=${text}&langpair=${lang}`)
-.then(res => res.json())
-.then(data => {
-document.getElementById("result").innerText = data.responseData.translatedText;
-});
+if(text.trim()===""){
+alert("Please enter a word or sentence");
+return;
 }
 
-function speak(){
-let msg = new SpeechSynthesisUtterance();
-msg.text = document.getElementById("text").value;
+let url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${lang}`;
+
+let res = await fetch(url);
+let data = await res.json();
+
+document.getElementById("result").innerText = data.responseData.translatedText;
+}
+
+function speakText(){
+let text = document.getElementById("text").value;
+if(text.trim()===""){
+alert("Please type something");
+return;
+}
+let msg = new SpeechSynthesisUtterance(text);
 speechSynthesis.speak(msg);
 }
-
 </script>
 
 </body>
